@@ -255,18 +255,6 @@ FROM condition_occurrence
 Where condition_concept_name like '%pulmonary disease%' or condition_concept_name like '%lung disease%' or condition_concept_name like '%chronic bronchitis' or condition_concept_name like '%Chronic bronchitis'
 
 @transform_pandas(
-    Output(rid="ri.vector.main.execute.10dd66f8-3cb1-4924-a7b3-a8bb384836b2"),
-    temp_data=Input(rid="ri.foundry.main.dataset.4b3702b8-dad5-4cbb-85a9-1d6543dce5ec")
-)
-SELECT  temp_patient,
-        temp_date,
-        c19,
-        HFcase,
-        temp_value as temp_C
-FROM temp_data
-WHERE temp_value <50
-
-@transform_pandas(
     Output(rid="ri.vector.main.execute.1d4eb8bc-f8bf-4c15-8db1-b5ca1dad9388"),
     BP_data=Input(rid="ri.foundry.main.dataset.0b1d3124-c55f-4968-906d-d150d866eee6")
 )
@@ -285,25 +273,6 @@ select  c19_status,
 from first_DBP
 group by c19_status
 order by num_records asc
-
-@transform_pandas(
-    Output(rid="ri.vector.main.execute.dad5ccd8-e0e0-4ae9-9b42-ee2bbafd78df"),
-    temp_data=Input(rid="ri.foundry.main.dataset.4b3702b8-dad5-4cbb-85a9-1d6543dce5ec")
-)
-SELECT *
-FROM temp_data
-WHERE temp_value >50
-
-@transform_pandas(
-    Output(rid="ri.vector.main.execute.fd4a46dc-f1db-4116-8d55-c8e32ee4845d"),
-    F_temp_data=Input(rid="ri.vector.main.execute.dad5ccd8-e0e0-4ae9-9b42-ee2bbafd78df")
-)
-SELECT  temp_patient,
-        temp_date,
-        c19,
-        HFcase,
-        ((temp_value - 32) * (5/9)) as temp_C
-FROM F_temp_data
 
 @transform_pandas(
     Output(rid="ri.vector.main.execute.c0ff565c-9674-4cd8-8637-c998e9f8f102"),
@@ -1048,30 +1017,6 @@ FROM c19_IRtime_update
 group by sex
 
 @transform_pandas(
-    Output(rid="ri.vector.main.execute.c52837e3-0ddb-4a5c-b0c5-ed2d1e7b2a9b"),
-    C_temp_data=Input(rid="ri.vector.main.execute.10dd66f8-3cb1-4924-a7b3-a8bb384836b2"),
-    F_to_C_temp=Input(rid="ri.vector.main.execute.fd4a46dc-f1db-4116-8d55-c8e32ee4845d")
-)
-SELECT *
-FROM F_to_C_temp union 
-SELECT *
-FROM C_temp_data
-
-@transform_pandas(
-    Output(rid="ri.vector.main.execute.e9a1d83c-74ce-4551-b53b-e91645f41350"),
-    first_celcius=Input(rid="ri.vector.main.execute.c051c481-8df6-48da-9727-01a07c3dcc00")
-)
-select  c19_status, 
-        count(1) as num_records,
-        avg(celcius_value) as MeanCelcius,
-        stddev_samp(celcius_value),
-        min(celcius_value),
-        max(celcius_value)        
-from first_celcius
-group by c19_status
-order by num_records asc
-
-@transform_pandas(
     Output(rid="ri.vector.main.execute.f86bd138-46c1-4867-a56a-6679bc3c4149"),
     ACE_ARB_BB_statin=Input(rid="ri.vector.main.execute.5ab56f4d-721a-4669-aede-56d08d87785a")
 )
@@ -1423,19 +1368,6 @@ SELECT  min(tn_date) as first_Tn_unk,
         first_value(tn_value) as Tn_unk_level    
 FROM Tn_unk_labs
 GROUP BY tn_patient
-
-@transform_pandas(
-    Output(rid="ri.vector.main.execute.c051c481-8df6-48da-9727-01a07c3dcc00"),
-    celcius_data=Input(rid="ri.vector.main.execute.c52837e3-0ddb-4a5c-b0c5-ed2d1e7b2a9b")
-)
-SELECT min(temp_date) as first_celcius,
-        first_value(temp_patient) as celcius_ID,
-        first_value (temp_C) as celcius_value,
-        first_value(c19) as c19_status,
-        first_value(HFcase) as HF_status
-FROM celcius_data
-WHERE temp_C >0 and temp_C <50
-GROUP BY temp_patient
 
 @transform_pandas(
     Output(rid="ri.foundry.main.dataset.1d76a5fe-d0de-4007-9360-069ed05808e1"),
@@ -2162,46 +2094,6 @@ ON dataset_all_update.ID = statin.person_id
 WHERE statin.drug_era_start_date <= dataset_all_update.index_dc and statin.person_id is not null
 
 @transform_pandas(
-    Output(rid="ri.foundry.main.dataset.4b3702b8-dad5-4cbb-85a9-1d6543dce5ec"),
-    dataset_all_update=Input(rid="ri.foundry.main.dataset.426d31d3-0c08-44cb-8ab6-3fc00fb57b3d"),
-    temps_macrovisit=Input(rid="ri.vector.main.execute.01527219-10b2-42f5-a3a8-dd0947fb0a6c")
-)
-SELECT  temps_macrovisit.temp_patient,
-        temps_macrovisit.temp_value,
-        temps_macrovisit.temp_date,        
-        dataset_all_update.c19,
-        dataset_all_update.HFcase
-FROM dataset_all_update left join temps_macrovisit
-ON dataset_all_update.macrovisit_num = temps_macrovisit.macrovisit_id
-WHERE temps_macrovisit.temp_patient is not null
-
-@transform_pandas(
-    Output(rid="ri.vector.main.execute.8df2d63b-7336-4e9b-8432-d764248cef1c"),
-    measurement=Input(rid="ri.foundry.main.dataset.29834e2c-f924-45e8-90af-246d29456293")
-)
-SELECT  person_id as temp_patient,
-        measurement_id as temp_measurement_id,
-        measurement_concept_name as temp_type,
-        harmonized_value_as_number as temp_value_harmonized,
-        value_as_number as temp_value,
-        measurement_date as temp_date
-FROM measurement
-WHERE measurement_concept_name like '%temperature%' or measurement_concept_name like '%Temperature%' 
-
-@transform_pandas(
-    Output(rid="ri.vector.main.execute.01527219-10b2-42f5-a3a8-dd0947fb0a6c"),
-    measurements_to_macrovisits=Input(rid="ri.foundry.main.dataset.7d655791-94cc-4322-b9e9-ce66308126f5"),
-    temps=Input(rid="ri.vector.main.execute.8df2d63b-7336-4e9b-8432-d764248cef1c")
-)
-SELECT  temps.temp_patient,
-        temps.temp_date,
-        temps.temp_value,
-        measurements_to_macrovisits.macrovisit_id
-FROM temps left join measurements_to_macrovisits 
-ON temps.temp_measurement_id = measurements_to_macrovisits.measurement_id  
-WHERE measurements_to_macrovisits.macrovisit_id is not null and temp_value is not null
-
-@transform_pandas(
     Output(rid="ri.foundry.main.dataset.878498d5-3a01-4815-adab-6e92f85a8db0"),
     dataset_all_update=Input(rid="ri.foundry.main.dataset.426d31d3-0c08-44cb-8ab6-3fc00fb57b3d"),
     tn_macrovisit=Input(rid="ri.vector.main.execute.1655d6c8-8dd2-41d8-b8cd-6cef2c2599e8")
@@ -2256,6 +2148,6 @@ FROM dataset_all_Rx
 )
 SELECT  percentile_approx(futime_all, 0.5) as Allmedian,
         percentile_approx(futime_all, 0.25) as Allq1,
-        percentile_approx(futime_all, 0.75) as Allq3,
+        percentile_approx(futime_all, 0.75) as Allq3
 FROM dataset_all_Rx
 
