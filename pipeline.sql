@@ -7,9 +7,9 @@
 )
 SELECT  first_ARB.ARB_prior,
         ACE_dataset.ACEi_prior,
-        ACE_dataset.ID
+        ACE_dataset.patient_id
 FROM ACE_dataset left join first_ARB
-ON ACE_dataset.ID = first_ARB.ARB_ID
+ON ACE_dataset.patient_id = first_ARB.ARB_ID
 
 @transform_pandas(
     Output(rid="ri.vector.main.execute.d0904f4b-a771-4759-97d1-33dc7a611a52"),
@@ -18,23 +18,23 @@ ON ACE_dataset.ID = first_ARB.ARB_ID
 )
 SELECT  ACE_ARB.ACEi_prior,
         ACE_ARB.ARB_prior,
-        ACE_ARB.ID,
+        ACE_ARB.patient_id,
         first_BB.BB_prior
 FROM ACE_ARB left join first_BB
-ON ACE_ARB.ID = first_BB.BB_ID
+ON ACE_ARB.patient_id = first_BB.BB_ID
 
 @transform_pandas(
     Output(rid="ri.vector.main.execute.5ab56f4d-721a-4669-aede-56d08d87785a"),
     ACE_ARB_BB=Input(rid="ri.vector.main.execute.d0904f4b-a771-4759-97d1-33dc7a611a52"),
     first_statin=Input(rid="ri.vector.main.execute.e9ec7d30-5cb3-4290-a22c-c3b841853993")
 )
-SELECT  ACE_ARB_BB.ID as Rx_ID,
+SELECT  ACE_ARB_BB.patient_id as Rx_ID,
         ACE_ARB_BB.ACEi_prior,
         ACE_ARB_BB.ARB_prior,
         ACE_ARB_BB.BB_prior,
         first_statin.statin_prior
 FROM ACE_ARB_BB left join first_statin
-ON ACE_ARB_BB.ID = first_statin.statin_ID
+ON ACE_ARB_BB.patient_id = first_statin.statin_ID
 
 @transform_pandas(
     Output(rid="ri.vector.main.execute.88b9b130-1763-4c8b-b237-cbfa61cc36e6"),
@@ -42,9 +42,9 @@ ON ACE_ARB_BB.ID = first_statin.statin_ID
     first_ACEi=Input(rid="ri.vector.main.execute.f9744ba9-81eb-434f-85fe-050eaba77f65")
 )
 SELECT first_ACEi.ACEi_prior,
-        dataset_all_update.ID
+        dataset_all_update.patient_id
 FROM dataset_all_update left join first_ACEi
-ON dataset_all_update.ID = first_ACEi.ACEi_ID
+ON dataset_all_update.patient_id = first_ACEi.ACEi_ID
 
 @transform_pandas(
     Output(rid="ri.vector.main.execute.3032fa50-5f50-4582-aff8-071447903533"),
@@ -57,7 +57,7 @@ SELECT  ACEi.person_id as ACE_patient,
        dataset_all_update.c19,
        dataset_all_update.HFcase
 FROM dataset_all_update left join ACEi
-ON dataset_all_update.ID = ACEi.person_id
+ON dataset_all_update.patient_id = ACEi.person_id
 WHERE ACEi.drug_era_start_date <= dataset_all_update.index_dc and ACEi.person_id is not null
 
 @transform_pandas(
@@ -113,7 +113,7 @@ SELECT  ARB.person_id as ARB_patient,
        dataset_all_update.c19,
        dataset_all_update.HFcase
 FROM dataset_all_update left join ARB
-ON dataset_all_update.ID = ARB.person_id
+ON dataset_all_update.patient_id = ARB.person_id
 WHERE ARB.drug_era_start_date <= dataset_all_update.index_dc and ARB.person_id is not null
 
 @transform_pandas(
@@ -148,7 +148,7 @@ SELECT  BB.person_id as BB_patient,
        dataset_all_update.c19,
        dataset_all_update.HFcase
 FROM dataset_all_update left join BB
-ON dataset_all_update.ID = BB.person_id
+ON dataset_all_update.patient_id = BB.person_id
 WHERE BB.drug_era_start_date <= dataset_all_update.index_dc and BB.person_id is not null
 
 @transform_pandas(
@@ -179,7 +179,7 @@ order by num_records asc
 )
 SELECT *
 FROM dataset_all_Rx left join hi_NP_patient
-ON dataset_all_Rx.ID = hi_NP_patient.hi_NP_ID
+ON dataset_all_Rx.Rx_ID = hi_NP_patient.hi_NP_ID
 
 @transform_pandas(
     Output(rid="ri.foundry.main.dataset.0b1d3124-c55f-4968-906d-d150d866eee6"),
@@ -359,6 +359,62 @@ SELECT  person_id as HTN_id,
         condition_start_date as HTN_start      
 FROM condition_occurrence
 Where condition_concept_name like '%hypertensi%' or condition_concept_name like '%Hypertensi%'
+
+@transform_pandas(
+    Output(rid="ri.vector.main.execute.34e01075-721a-4d2c-be0e-f3af00fcc34d"),
+    dataset_all_F=Input(rid="ri.vector.main.execute.555f06a2-ad3d-4a50-83bc-f41cce076e70")
+)
+SELECT count(patient_id)
+FROM dataset_all_F
+
+@transform_pandas(
+    Output(rid="ri.vector.main.execute.c6cc1eb4-1580-4889-b41c-efd75ee5a55a"),
+    dataset_all_M=Input(rid="ri.vector.main.execute.afb8595c-da82-430e-ada5-acfa6ecbe19a")
+)
+SELECT count(patient_id)
+FROM dataset_all_M
+
+@transform_pandas(
+    Output(rid="ri.vector.main.execute.e315a15d-f165-4db5-b569-76c28d55ae99"),
+    dataset_No_Rx=Input(rid="ri.vector.main.execute.daf437ee-de2c-4bb3-a390-d4c1e81f97d8")
+)
+SELECT count(patient_id)
+FROM dataset_No_Rx
+
+@transform_pandas(
+    Output(rid="ri.vector.main.execute.9c5aab98-a276-48f0-a44f-ca5c56e65964"),
+    dataset_all_nonwhite=Input(rid="ri.vector.main.execute.4607ebab-6a6e-4075-81b8-d290bb1784e5")
+)
+SELECT count(patient_id)
+FROM dataset_all_nonwhite
+
+@transform_pandas(
+    Output(rid="ri.vector.main.execute.063ac948-8a80-41a4-aa80-595d56a3b570"),
+    dataset_all_over65=Input(rid="ri.vector.main.execute.99845b4a-5950-466d-9366-4758069efd5a")
+)
+SELECT count(patient_id)
+FROM dataset_all_over65
+
+@transform_pandas(
+    Output(rid="ri.vector.main.execute.d0234bd2-a6d6-47d0-bcc9-0140fa5581be"),
+    dataset_all_under65=Input(rid="ri.vector.main.execute.c6cb4360-24c7-454a-9fd9-e19230e99c12")
+)
+SELECT count (patient_id)        
+FROM dataset_all_under65
+
+@transform_pandas(
+    Output(rid="ri.vector.main.execute.5a5b5c17-1862-4943-b780-8b403970044b"),
+    dataset_all_white=Input(rid="ri.vector.main.execute.b0401bbb-c7b7-40d2-ab32-848725e12bc7")
+)
+SELECT count(patient_id)
+FROM dataset_all_white
+
+@transform_pandas(
+    Output(rid="ri.vector.main.execute.011b0fa1-7470-4083-942d-326e99307424"),
+    dataset_with_Rx=Input(rid="ri.vector.main.execute.d5572b3d-7264-40ff-b6d1-31f86981f174")
+)
+SELECT count(patient_id)
+FROM dataset_with_Rx
 
 @transform_pandas(
     Output(rid="ri.foundry.main.dataset.d482e4c9-bfda-4b9e-9532-72b27defb2d0"),
@@ -562,10 +618,10 @@ WHERE measurements_to_macrovisits.macrovisit_id is not null
     first_CAD=Input(rid="ri.foundry.main.dataset.9982d9a0-564f-49d1-a370-14b8b1f09d19")
 )
 SELECT  c19_IRtime_update.patient_id,
-        first_CAD.CAD_patient        
+        first_CAD.CAD_patient,
+        case when ((first_CAD.first_CAD_date is null) or (c19_IRtime_update.index_dc < first_CAD.first_CAD_date)) then 0 else 1 end as CAD_hx               
 FROM c19_IRtime_update left join first_CAD
 on c19_IRtime_update.patient_id = first_CAD.CAD_patient
-where (c19_IRtime_update.index_dc >= first_CAD.first_CAD_date) or (first_CAD_date is null)
 
 @transform_pandas(
     Output(rid="ri.vector.main.execute.488941a1-60c7-47ad-9dba-8fff870d3986"),
@@ -580,9 +636,9 @@ where CAD_patient is not null
     c19_CAD=Input(rid="ri.vector.main.execute.967bfaa1-bf74-4f76-a1bb-6d8b2942f902"),
     c19_obese=Input(rid="ri.vector.main.execute.6f37a1eb-08ca-4ea3-bf1c-70e8b2b55f4a")
 )
-SELECT  c19_CAD.patient_id as ID,
-        (c19_CAD.CAD_patient / c19_CAD.CAD_patient) as CAD,
-        (c19_obese.obese_patient / c19_obese.obese_patient) as obese
+SELECT  c19_obese.patient_id,
+        c19_obese.obese_hx,
+        c19_CAD.CAD_hx
 FROM c19_CAD inner join c19_obese
 on c19_CAD.patient_id = c19_obese.patient_id
 
@@ -591,12 +647,12 @@ on c19_CAD.patient_id = c19_obese.patient_id
     c19_CADobese=Input(rid="ri.vector.main.execute.2f49dac1-2786-4fd1-9222-8a1858d0c7e0"),
     c19_CKD=Input(rid="ri.vector.main.execute.ad462052-f38e-46a2-b021-459e21fe6b93")
 )
-SELECT  c19_CADobese.ID,
-        c19_CADobese.CAD,
-        c19_CADobese.obese,
-        (c19_CKD.CKD_patient / c19_CKD.CKD_patient) as CKD
+SELECT  c19_CADobese.patient_id,
+        c19_CADobese.CAD_hx,
+        c19_CADobese.obese_hx,
+        c19_CKD.CKD_hx
 FROM c19_CADobese inner join c19_CKD
-on c19_CADobese.ID = c19_CKD.patient_id
+on c19_CADobese.patient_id = c19_CKD.patient_id
 
 @transform_pandas(
     Output(rid="ri.vector.main.execute.ad462052-f38e-46a2-b021-459e21fe6b93"),
@@ -604,10 +660,10 @@ on c19_CADobese.ID = c19_CKD.patient_id
     first_CKD=Input(rid="ri.foundry.main.dataset.7dc5eb1b-8580-42e5-9b3a-81d64ced7431")
 )
 SELECT  c19_IRtime_update.patient_id,
-        first_CKD.CKD_patient        
+        first_CKD.CKD_patient,
+         case when ((first_CKD.first_CKD_date is null) or (c19_IRtime_update.index_dc < first_CKD.first_CKD_date)) then 0 else 1 end as CKD_hx       
 FROM c19_IRtime_update left join first_CKD
 on c19_IRtime_update.patient_id = first_CKD.CKD_patient
-where (c19_IRtime_update.index_dc >= first_CKD.first_CKD_date) or (first_CKD_date is null)
 
 @transform_pandas(
     Output(rid="ri.vector.main.execute.0f3be788-16ae-45a0-858e-6099893fab3c"),
@@ -623,10 +679,10 @@ where CKD_patient is not null
     first_COPD=Input(rid="ri.foundry.main.dataset.6feae61c-75ec-4e9b-81a3-4ddfb0662b4b")
 )
 SELECT  c19_IRtime_update.patient_id,
-        first_COPD.COPD_patient        
+        first_COPD.COPD_patient,
+        case when ((first_COPD.first_COPD_date is null) or (c19_IRtime_update.index_dc < first_COPD.first_COPD_date)) then 0 else 1 end as COPD_hx        
 FROM c19_IRtime_update left join first_COPD
 on c19_IRtime_update.patient_id = first_COPD.COPD_patient
-where (c19_IRtime_update.index_dc > first_COPD.first_COPD_date) or (first_COPD_date is null) 
 
 @transform_pandas(
     Output(rid="ri.vector.main.execute.be881480-5441-42fc-9905-d2c98af19312"),
@@ -643,10 +699,10 @@ where COPD_patient is not null
 )
 SELECT  c19_IRtime_update.patient_id,
         c19_IRtime_update.HF,              
-        first_DM.DM_patient        
+        first_DM.DM_patient,
+        case when ((first_DM.first_DM_date is null) or (c19_IRtime_update.index_dc < first_DM.first_DM_date)) then 0 else 1 end as DM_hx   
 FROM c19_IRtime_update left join first_DM
 on c19_IRtime_update.patient_id = first_DM.DM_patient
-where (c19_IRtime_update.index_dc >= first_DM.first_DM_date) or (first_DM_date is null)
 
 @transform_pandas(
     Output(rid="ri.vector.main.execute.a58057af-9b14-43d6-94e4-57e2ce91a472"),
@@ -704,10 +760,10 @@ Group by first_HF_descrip
     first_HTN=Input(rid="ri.foundry.main.dataset.13b4990e-0a61-45db-8369-3baec3b00bd4")
 )
 SELECT  c19_IRtime_update.patient_id,
-        first_HTN.HTN_patient        
+        first_HTN.HTN_patient,
+         case when ((first_HTN.first_HTN_date is null) or (c19_IRtime_update.index_dc < first_HTN.first_HTN_date)) then 0 else 1 end as HTN_hx             
 FROM c19_IRtime_update left join first_HTN
 on c19_IRtime_update.patient_id = first_HTN.HTN_patient
-where (c19_IRtime_update.index_dc >= first_HTN.first_HTN_date) or (first_HTN_date is null) 
 
 @transform_pandas(
     Output(rid="ri.vector.main.execute.c8a95e41-e5a5-40a4-89fb-97dfb8eaafd9"),
@@ -759,42 +815,42 @@ group by ethnicity
     c19_CADobeseCKD=Input(rid="ri.vector.main.execute.0d0f212d-6b37-464f-8cc9-b1feade5d8c4"),
     c19_DM=Input(rid="ri.vector.main.execute.c40deaed-d9a2-4bf0-8f65-440eb077acfb")
 )
-SELECT  c19_CADobeseCKD.ID,
-        c19_CADobeseCKD.CAD,
-        c19_CADobeseCKD.obese,
-        c19_CADobeseCKD.CKD,
-        (c19_DM.DM_patient / c19_DM.DM_patient) as DM
+SELECT  c19_CADobeseCKD.patient_id,
+        c19_CADobeseCKD.CAD_hx,
+        c19_CADobeseCKD.obese_hx,
+        c19_CADobeseCKD.CKD_hx,
+        c19_DM.DM_hx
 FROM c19_CADobeseCKD inner join c19_DM
-on c19_CADobeseCKD.ID = c19_DM.patient_id
+on c19_CADobeseCKD.patient_id = c19_DM.patient_id
 
 @transform_pandas(
     Output(rid="ri.vector.main.execute.4f96cd6d-eed5-45f5-a2c9-65858bb166be"),
     c19_COPD=Input(rid="ri.vector.main.execute.ec4d4201-cb9c-47ac-811e-8d78ba4a20cc"),
     c19_comorbid=Input(rid="ri.vector.main.execute.ddc141b0-bddd-4aa1-8e45-d9e8aa64924f")
 )
-SELECT  c19_comorbid.ID,
-        c19_comorbid.CAD,
-        c19_comorbid.obese,
-        c19_comorbid.CKD,
-        c19_comorbid.DM,
-        (c19_COPD.COPD_patient / c19_COPD.COPD_patient) as COPD
+SELECT  c19_comorbid.patient_id,
+        c19_comorbid.CAD_hx,
+        c19_comorbid.obese_hx,
+        c19_comorbid.CKD_hx,
+        c19_comorbid.DM_hx,
+        c19_COPD.COPD_hx
 FROM c19_comorbid inner join c19_COPD
-on c19_comorbid.ID = c19_COPD.patient_id
+on c19_comorbid.patient_id = c19_COPD.patient_id
 
 @transform_pandas(
     Output(rid="ri.vector.main.execute.bca3bd2d-7652-4f85-af23-bc9cf4e8bc51"),
     c19_HTN=Input(rid="ri.vector.main.execute.066c4682-82ca-4d0b-87f1-04aede9996a4"),
     c19_comorbid_COPD=Input(rid="ri.vector.main.execute.4f96cd6d-eed5-45f5-a2c9-65858bb166be")
 )
-SELECT  c19_comorbid_COPD.ID,
-        c19_comorbid_COPD.CAD,
-        c19_comorbid_COPD.obese,
-        c19_comorbid_COPD.CKD,
-        c19_comorbid_COPD.DM,
-        c19_comorbid_COPD.COPD,
-        (c19_HTN.HTN_patient / c19_HTN.HTN_patient) as HTN
+SELECT  c19_comorbid_COPD.patient_id,
+        c19_comorbid_COPD.CAD_hx,
+        c19_comorbid_COPD.obese_hx,
+        c19_comorbid_COPD.CKD_hx,
+        c19_comorbid_COPD.DM_hx,
+        c19_comorbid_COPD.COPD_hx,
+        c19_HTN.HTN_hx
 FROM c19_comorbid_COPD inner join c19_HTN
-on c19_comorbid_COPD.ID = c19_HTN.patient_id
+on c19_comorbid_COPD.patient_id = c19_HTN.patient_id
 
 @transform_pandas(
     Output(rid="ri.vector.main.execute.539a6a3e-06c7-4340-86a9-70eaa56dab1d"),
@@ -913,7 +969,8 @@ FROM index_c19_first
     c19_IRtime_update=Input(rid="ri.foundry.main.dataset.966c2e76-c46f-41e0-8b8d-b9ab773a460d")
 )
 SELECT  avg(age),
-        stddev_samp(age)
+        stddev_samp(age),
+        count(1) as num_age
 FROM c19_IRtime_update
 
 @transform_pandas(
@@ -924,6 +981,7 @@ FROM c19_IRtime_update
 SELECT  c19_IRtime_update.index_dc,
         c19_IRtime_update.sex,
         c19_IRtime_update.race,
+        c19_IRtime_update.ethnicity,
         c19_IRtime_update.age,
         c19_IRtime_update.futime_all,
         c19_IRtime_update.futime_Death,
@@ -932,17 +990,25 @@ SELECT  c19_IRtime_update.index_dc,
         (c19_IRtime_update.futime_HF + c19_IRtime_update.futime_DeathNoHF + c19_IRtime_update.futime_NoEvent) as futime_Comp,
         case when (c19_IRtime_update.DeathNoHF_ID is null and c19_IRtime_update.HF is null) then 0 else 1 end as comp_case,
         c19_IRtime_update.macrovisit_num,
-        coalesce (c19_IRtime_update.HF, 0) as HFcase,
+        coalesce (c19_IRtime_update.HF, 0) as HFcase,        
         c19_IRtime_update.c19,
-        c19_comorbid_all.ID,
-        coalesce (c19_comorbid_all.CAD, 0) as hxCAD,
-        coalesce (c19_comorbid_all.obese, 0) as hxObese,
-        coalesce (c19_comorbid_all.CKD, 0) as hxCKD,
-        coalesce (c19_comorbid_all.DM, 0) as hxDM,
-        coalesce (c19_comorbid_all.COPD, 0) as hxCOPD,
-        coalesce (c19_comorbid_all.HTN, 0) as hxHTN
+        c19_comorbid_all.patient_id,
+        c19_comorbid_all.CAD_hx,
+        c19_comorbid_all.obese_hx,
+        c19_comorbid_all.CKD_hx,
+        c19_comorbid_all.DM_hx,
+        c19_comorbid_all.COPD_hx,
+        c19_comorbid_all.HTN_hx
 FROM c19_IRtime_update inner join c19_comorbid_all
-on c19_IRtime_update.patient_id = c19_comorbid_all.ID
+on c19_IRtime_update.patient_id = c19_comorbid_all.patient_id
+
+@transform_pandas(
+    Output(rid="ri.vector.main.execute.5f86e980-9b0a-4f8e-8ee0-d7bf12f79b5c"),
+    c19_multivar=Input(rid="ri.foundry.main.dataset.bf95b4bd-8854-432f-9b29-e9827a68170f")
+)
+SELECT count(patient_id) 
+FROM c19_multivar
+where age is null
 
 @transform_pandas(
     Output(rid="ri.vector.main.execute.e6b39eb8-7215-49e0-8be9-24df255c37d6"),
@@ -968,10 +1034,10 @@ FROM c19_noHxHF
     first_obese=Input(rid="ri.foundry.main.dataset.1d76a5fe-d0de-4007-9360-069ed05808e1")
 )
 SELECT  c19_IRtime_update.patient_id,
-        first_obese.obese_patient        
+        first_obese.obese_patient,
+        case when ((first_obese.first_obese_date is null) or (c19_IRtime_update.index_dc < first_obese.first_obese_date)) then 0 else 1 end as obese_hx        
 FROM c19_IRtime_update left join first_obese
 on c19_IRtime_update.patient_id = first_obese.obese_patient
-where (c19_IRtime_update.index_dc >= first_obese.first_obese_date) or (first_obese_date is null) 
 
 @transform_pandas(
     Output(rid="ri.vector.main.execute.b9557bdb-71de-4717-add3-87e8953f4a31"),
@@ -1028,26 +1094,27 @@ SELECT  ACE_ARB_BB_statin.Rx_ID,
 FROM ACE_ARB_BB_statin
 
 @transform_pandas(
-    Output(rid="ri.vector.main.execute.7fd71dbc-ced0-449d-8cb3-b39e93e1c2d5"),
+    Output(rid="ri.foundry.main.dataset.affd8c40-b8a7-4a79-b931-da39819027b0"),
     c19_multivar=Input(rid="ri.foundry.main.dataset.bf95b4bd-8854-432f-9b29-e9827a68170f"),
     noC19_multivar=Input(rid="ri.foundry.main.dataset.1643de5a-9154-48e2-97c4-59043804a4e7")
 )
 SELECT *
 FROM noC19_multivar 
-where sex in ("FEMALE", "MALE")
+where sex in ("FEMALE", "MALE") and age is not null
 union
 select *
 from c19_multivar
-where sex in ("FEMALE", "MALE")
+where sex in ("FEMALE", "MALE") and age is not null
 
 @transform_pandas(
-    Output(rid="ri.vector.main.execute.8dba9439-a328-4132-88ef-9160ced62346"),
-    data_all=Input(rid="ri.vector.main.execute.7fd71dbc-ced0-449d-8cb3-b39e93e1c2d5"),
-    dataset_white=Input(rid="ri.vector.main.execute.815049d4-c55d-4fbd-aa0f-e393f2a0916c")
+    Output(rid="ri.foundry.main.dataset.f6ecee75-869a-4a54-8f56-b776eec2c0f7"),
+    data_all=Input(rid="ri.foundry.main.dataset.affd8c40-b8a7-4a79-b931-da39819027b0"),
+    white=Input(rid="ri.vector.main.execute.14a5b1b0-0a6c-4af6-8014-23591498c251")
 )
 SELECT *
-FROM data_all left join dataset_white
-on data_all.ID = dataset_white.white_id
+FROM data_all left join white
+on data_all.patient_id = white.racegrp_id
+where racegrp_id is not null
 
 @transform_pandas(
     Output(rid="ri.vector.main.execute.daf437ee-de2c-4bb3-a390-d4c1e81f97d8"),
@@ -1080,7 +1147,7 @@ WHERE sex = "MALE"
 )
 SELECT *
 FROM data_Rx left join dataset_all_update
-ON dataset_all_update.ID = data_Rx.Rx_ID
+ON data_Rx.Rx_ID = dataset_all_update.patient_id
 
 @transform_pandas(
     Output(rid="ri.vector.main.execute.4607ebab-6a6e-4075-81b8-d290bb1784e5"),
@@ -1088,7 +1155,7 @@ ON dataset_all_update.ID = data_Rx.Rx_ID
 )
 SELECT *
 FROM dataset_all_Rx
-WHERE racegroup = 0
+WHERE white = 0
 
 @transform_pandas(
     Output(rid="ri.vector.main.execute.99845b4a-5950-466d-9366-4758069efd5a"),
@@ -1108,10 +1175,9 @@ WHERE age <65
 
 @transform_pandas(
     Output(rid="ri.foundry.main.dataset.426d31d3-0c08-44cb-8ab6-3fc00fb57b3d"),
-    data_all_race=Input(rid="ri.vector.main.execute.8dba9439-a328-4132-88ef-9160ced62346")
+    data_all_race=Input(rid="ri.foundry.main.dataset.f6ecee75-869a-4a54-8f56-b776eec2c0f7")
 )
 SELECT  *,
-        coalesce(White, 0) as racegroup,
         coalesce(DeathNoHF, 0) as DeathNoHF_case,
         coalesce(Death, 0) as Death_case
 FROM data_all_race
@@ -1122,7 +1188,7 @@ FROM data_all_race
 )
 SELECT *
 FROM dataset_all_Rx
-WHERE racegroup = 1
+WHERE white = 1
 
 @transform_pandas(
     Output(rid="ri.vector.main.execute.b3924844-f15b-438c-b503-bdcef00b6f3b"),
@@ -1135,9 +1201,9 @@ FROM dataset_all_Rx
 
 @transform_pandas(
     Output(rid="ri.vector.main.execute.815049d4-c55d-4fbd-aa0f-e393f2a0916c"),
-    data_all=Input(rid="ri.vector.main.execute.7fd71dbc-ced0-449d-8cb3-b39e93e1c2d5")
+    data_all=Input(rid="ri.foundry.main.dataset.affd8c40-b8a7-4a79-b931-da39819027b0")
 )
-SELECT  ID as white_id,
+SELECT  patient_id as white_id,
         1 as White
 FROM data_all
 where race = "White"
@@ -1545,27 +1611,28 @@ group by patient_id1
     noC19_IRtime_update=Input(rid="ri.foundry.main.dataset.d89d4a69-6f43-4416-8cc4-e9a5bb96fa0b")
 )
 SELECT  noC19_IRtime_update.patient_id,
-        first_CAD.CAD_patient        
+        first_CAD.CAD_patient,
+         case when ((first_CAD.first_CAD_date is null) or (noC19_IRtime_update.index_dc < first_CAD.first_CAD_date)) then 0 else 1 end as CAD_hx         
 FROM noC19_IRtime_update left join first_CAD
 on noC19_IRtime_update.patient_id = first_CAD.CAD_patient
-where (noC19_IRtime_update.index_dc >= first_CAD.first_CAD_date) or (first_CAD_date is null)
 
 @transform_pandas(
     Output(rid="ri.vector.main.execute.d0a8b28d-2d2f-4c2c-87e5-aa9c832d817e"),
     noC19_CAD=Input(rid="ri.vector.main.execute.972341f9-b4d4-4ea3-8925-89f92bffa596")
 )
-SELECT count(patient_id)
+SELECT CAD_hx,
+        count(1) as CADpatient
 FROM noC19_CAD
-where CAD_patient is not null
+group by CAD_hx
 
 @transform_pandas(
     Output(rid="ri.vector.main.execute.6660254d-a531-4da9-ab42-3d931e187a6c"),
     noC19_CAD=Input(rid="ri.vector.main.execute.972341f9-b4d4-4ea3-8925-89f92bffa596"),
     noC19_obese=Input(rid="ri.vector.main.execute.bd4e5971-3138-4dd4-a438-9cac869516a8")
 )
-SELECT  noC19_CAD.patient_id as ID,
-        (noC19_CAD.CAD_patient / noC19_CAD.CAD_patient) as CAD,
-        (noC19_obese.obese_patient / noC19_obese.obese_patient) as obese
+SELECT  noC19_obese.patient_id,
+        noC19_obese.obese_hx,
+        noC19_CAD.CAD_hx
 FROM noC19_CAD inner join noC19_obese
 on noC19_CAD.patient_id = noC19_obese.patient_id
 
@@ -1574,12 +1641,12 @@ on noC19_CAD.patient_id = noC19_obese.patient_id
     noC19_CADobese=Input(rid="ri.vector.main.execute.6660254d-a531-4da9-ab42-3d931e187a6c"),
     noC19_CKD=Input(rid="ri.vector.main.execute.81e34bf4-2ea4-42d8-b14b-3229c4d2b2c7")
 )
-SELECT  noC19_CADobese.ID,
-        noC19_CADobese.CAD,
-        noC19_CADobese.obese,
-        (noC19_CKD.CKD_patient / noC19_CKD.CKD_patient) as CKD
+SELECT  noC19_CADobese.patient_id,
+        noC19_CADobese.CAD_hx,
+        noC19_CADobese.obese_hx,
+        noC19_CKD.CKD_hx
 FROM noC19_CADobese inner join noC19_CKD
-on noC19_CADobese.ID = noC19_CKD.patient_id
+on noC19_CADobese.patient_id = noC19_CKD.patient_id
 
 @transform_pandas(
     Output(rid="ri.vector.main.execute.81e34bf4-2ea4-42d8-b14b-3229c4d2b2c7"),
@@ -1587,18 +1654,19 @@ on noC19_CADobese.ID = noC19_CKD.patient_id
     noC19_IRtime_update=Input(rid="ri.foundry.main.dataset.d89d4a69-6f43-4416-8cc4-e9a5bb96fa0b")
 )
 SELECT  noC19_IRtime_update.patient_id,
-        first_CKD.CKD_patient        
+        first_CKD.CKD_patient,
+        case when ((first_CKD.first_CKD_date is null) or (noC19_IRtime_update.index_dc < first_CKD.first_CKD_date)) then 0 else 1 end as CKD_hx        
 FROM noC19_IRtime_update left join first_CKD
 on noC19_IRtime_update.patient_id = first_CKD.CKD_patient
-where (noC19_IRtime_update.index_dc >= first_CKD.first_CKD_date) or (first_CKD_date is null)
 
 @transform_pandas(
     Output(rid="ri.vector.main.execute.57ecae7c-c3a4-4d57-9bc1-eed12398ef81"),
     noC19_CKD=Input(rid="ri.vector.main.execute.81e34bf4-2ea4-42d8-b14b-3229c4d2b2c7")
 )
-SELECT count(patient_id)
+SELECT  CKD_hx,
+        count(1) as CKDpatient
 FROM noC19_CKD
-where CKD_patient is not null
+group by CKD_hx
 
 @transform_pandas(
     Output(rid="ri.vector.main.execute.388a6135-6cfa-4cd8-aebd-baa8de14fe2f"),
@@ -1606,18 +1674,20 @@ where CKD_patient is not null
     noC19_IRtime_update=Input(rid="ri.foundry.main.dataset.d89d4a69-6f43-4416-8cc4-e9a5bb96fa0b")
 )
 SELECT  noC19_IRtime_update.patient_id,
-        first_COPD.COPD_patient        
+        first_COPD.COPD_patient,
+         case when ((first_COPD.first_COPD_date is null) or (noC19_IRtime_update.index_dc < first_COPD.first_COPD_date)) then 0 else 1 end as COPD_hx          
 FROM noC19_IRtime_update left join first_COPD
 on noC19_IRtime_update.patient_id = first_COPD.COPD_patient
-where (noC19_IRtime_update.index_dc >= first_COPD.first_COPD_date) or (first_COPD_date is null) 
+ 
 
 @transform_pandas(
     Output(rid="ri.vector.main.execute.5bd89996-9476-4075-b03d-dcc96caef15f"),
     noC19_COPD=Input(rid="ri.vector.main.execute.388a6135-6cfa-4cd8-aebd-baa8de14fe2f")
 )
-SELECT count(patient_id)
+SELECT COPD_hx,
+        count(1) as COPDpatient
 FROM noC19_COPD
-where COPD_patient is not null
+group by COPD_hx
 
 @transform_pandas(
     Output(rid="ri.vector.main.execute.16284b13-9154-4c03-9682-162619695833"),
@@ -1626,18 +1696,19 @@ where COPD_patient is not null
 )
 SELECT  noC19_IRtime_update.patient_id,
         noC19_IRtime_update.HF,              
-        first_DM.DM_patient        
+        first_DM.DM_patient,
+        case when ((first_DM.first_DM_date is null) or (noC19_IRtime_update.index_dc < first_DM.first_DM_date)) then 0 else 1 end as DM_hx 
 FROM noC19_IRtime_update left join first_DM
 on noC19_IRtime_update.patient_id = first_DM.DM_patient
-where (noC19_IRtime_update.index_dc >= first_DM.first_DM_date) or (first_DM_date is null)
 
 @transform_pandas(
     Output(rid="ri.vector.main.execute.5eba00ba-9e43-494a-b0e0-1431cd4ed766"),
     noC19_DM=Input(rid="ri.vector.main.execute.16284b13-9154-4c03-9682-162619695833")
 )
-SELECT  count(patient_id)  
+SELECT  DM_hx,
+        count(1) as DMpatient
 FROM noC19_DM
-Where DM_patient is not null
+group by DM_hx
 
 @transform_pandas(
     Output(rid="ri.vector.main.execute.fd80efb3-c450-4627-89a5-b06be5da7812"),
@@ -1682,18 +1753,19 @@ Group by first_HF_descrip
     noC19_IRtime_update=Input(rid="ri.foundry.main.dataset.d89d4a69-6f43-4416-8cc4-e9a5bb96fa0b")
 )
 SELECT  noC19_IRtime_update.patient_id,
-        first_HTN.HTN_patient        
+        first_HTN.HTN_patient,
+        case when ((first_HTN.first_HTN_date is null) or (noC19_IRtime_update.index_dc < first_HTN.first_HTN_date)) then 0 else 1 end as HTN_hx         
 FROM noC19_IRtime_update left join first_HTN
 on noC19_IRtime_update.patient_id = first_HTN.HTN_patient
-where (noC19_IRtime_update.index_dc >= first_HTN.first_HTN_date) or (first_HTN_date is null) 
 
 @transform_pandas(
     Output(rid="ri.vector.main.execute.c09e79ad-a0db-4e63-b2e9-9f36b69575d3"),
     noC19_HTN=Input(rid="ri.vector.main.execute.25567574-4957-4f0e-b601-d5235d41bc45")
 )
-SELECT count(patient_id)
+SELECT HTN_hx,
+        count(1) as HTNpatient
 FROM noC19_HTN
-where HTN_patient is not null
+group by HTN_hx
 
 @transform_pandas(
     Output(rid="ri.foundry.main.dataset.d89d4a69-6f43-4416-8cc4-e9a5bb96fa0b"),
@@ -1730,27 +1802,27 @@ group by ethnicity
     noC19_CADobeseCKD=Input(rid="ri.vector.main.execute.bcfd70d3-8624-40aa-9f3d-09f35d85c045"),
     noC19_DM=Input(rid="ri.vector.main.execute.16284b13-9154-4c03-9682-162619695833")
 )
-SELECT  noC19_CADobeseCKD.ID,
-        noC19_CADobeseCKD.CAD,
-        noC19_CADobeseCKD.obese,
-        noC19_CADobeseCKD.CKD,
-        (noC19_DM.DM_patient / noC19_DM.DM_patient) as DM
+SELECT  noC19_CADobeseCKD.patient_id,
+        noC19_CADobeseCKD.CAD_hx,
+        noC19_CADobeseCKD.obese_hx,
+        noC19_CADobeseCKD.CKD_hx,
+        noC19_DM.DM_hx
 FROM noC19_CADobeseCKD inner join noC19_DM
-on noC19_CADobeseCKD.ID = noC19_DM.patient_id
+on noC19_CADobeseCKD.patient_id = noC19_DM.patient_id
 
 @transform_pandas(
     Output(rid="ri.vector.main.execute.2329abbd-dc9a-4dbc-8dbf-d432b5c39836"),
     noC19_COPD=Input(rid="ri.vector.main.execute.388a6135-6cfa-4cd8-aebd-baa8de14fe2f"),
     noC19_comorbid=Input(rid="ri.vector.main.execute.0b1f3a73-1e85-42fb-bf42-2be7ea57e1cf")
 )
-SELECT  noC19_comorbid.ID,
-        noC19_comorbid.CAD,
-        noC19_comorbid.obese,
-        noC19_comorbid.CKD,
-        noC19_comorbid.DM,
-        (noC19_COPD.COPD_patient / noC19_COPD.COPD_patient) as COPD
+SELECT  noC19_comorbid.patient_id,
+        noC19_comorbid.CAD_hx,
+        noC19_comorbid.obese_hx,
+        noC19_comorbid.CKD_hx,
+        noC19_comorbid.DM_hx,
+        noC19_COPD.COPD_hx
 FROM noC19_comorbid inner join noC19_COPD
-on noC19_comorbid.ID = noC19_COPD.patient_id
+on noC19_comorbid.patient_id = noC19_COPD.patient_id
 
 @transform_pandas(
     Output(rid="ri.vector.main.execute.0dd0d213-d800-47b7-84c1-3d11927352ed"),
@@ -1765,15 +1837,15 @@ FROM noC19_comorbid
     noC19_HTN=Input(rid="ri.vector.main.execute.25567574-4957-4f0e-b601-d5235d41bc45"),
     noC19_comorbid_COPD=Input(rid="ri.vector.main.execute.2329abbd-dc9a-4dbc-8dbf-d432b5c39836")
 )
-SELECT  noC19_comorbid_COPD.ID,
-        noC19_comorbid_COPD.CAD,
-        noC19_comorbid_COPD.obese,
-        noC19_comorbid_COPD.CKD,
-        noC19_comorbid_COPD.DM,
-        noC19_comorbid_COPD.COPD,
-        (noC19_HTN.HTN_patient / noC19_HTN.HTN_patient) as HTN
+SELECT  noC19_comorbid_COPD.patient_id,
+        noC19_comorbid_COPD.CAD_hx,
+        noC19_comorbid_COPD.obese_hx,
+        noC19_comorbid_COPD.CKD_hx,
+        noC19_comorbid_COPD.DM_hx,
+        noC19_comorbid_COPD.COPD_hx,
+        noC19_HTN.HTN_hx
 FROM noC19_comorbid_COPD inner join noC19_HTN
-on noC19_comorbid_COPD.ID = noC19_HTN.patient_id
+on noC19_comorbid_COPD.patient_id = noC19_HTN.patient_id
 
 @transform_pandas(
     Output(rid="ri.vector.main.execute.2b68f388-4f63-4edb-8929-3b6b92349b56"),
@@ -1882,6 +1954,7 @@ FROM noC19_IRtime_update
 SELECT  noC19_IRtime_update.index_dc,
         noC19_IRtime_update.sex,
         noC19_IRtime_update.race,
+        noC19_IRtime_update.ethnicity,
         noC19_IRtime_update.age,
         noC19_IRtime_update.futime_all,
         noC19_IRtime_update.futime_Death,
@@ -1892,15 +1965,23 @@ SELECT  noC19_IRtime_update.index_dc,
         noC19_IRtime_update.macrovisit_num,
         coalesce (noC19_IRtime_update.HF, 0) as HFcase,        
         noC19_IRtime_update.c19,
-        noC19_comorbid_all.ID,
-        coalesce (noC19_comorbid_all.CAD, 0) as hxCAD,
-        coalesce (noC19_comorbid_all.obese, 0) as hxObese,
-        coalesce (noC19_comorbid_all.CKD, 0) as hxCKD,
-        coalesce (noC19_comorbid_all.DM, 0) as hxDM,
-        coalesce (noC19_comorbid_all.COPD, 0) as hxCOPD,
-        coalesce (noC19_comorbid_all.HTN, 0) as hxHTN
+        noC19_comorbid_all.patient_id,
+        noC19_comorbid_all.CAD_hx,
+        noC19_comorbid_all.obese_hx,
+        noC19_comorbid_all.CKD_hx,
+        noC19_comorbid_all.DM_hx,
+        noC19_comorbid_all.COPD_hx,
+        noC19_comorbid_all.HTN_hx
 FROM noC19_IRtime_update inner join noC19_comorbid_all
-on noC19_IRtime_update.patient_id = noC19_comorbid_all.ID
+on noC19_IRtime_update.patient_id = noC19_comorbid_all.patient_id
+
+@transform_pandas(
+    Output(rid="ri.vector.main.execute.c522b92b-b22f-4c8f-9ccc-298f21cce6c0"),
+    noC19_multivar=Input(rid="ri.foundry.main.dataset.1643de5a-9154-48e2-97c4-59043804a4e7")
+)
+SELECT count(patient_id)
+FROM noC19_multivar
+where age is null
 
 @transform_pandas(
     Output(rid="ri.vector.main.execute.8af5638e-0f5d-4445-aec3-6da0e093731c"),
@@ -1916,18 +1997,19 @@ FROM no_C19_noHxHF
     noC19_IRtime_update=Input(rid="ri.foundry.main.dataset.d89d4a69-6f43-4416-8cc4-e9a5bb96fa0b")
 )
 SELECT  noC19_IRtime_update.patient_id,
-        first_obese.obese_patient        
+        first_obese.obese_patient,
+        case when ((first_obese.first_obese_date is null) or (noC19_IRtime_update.index_dc < first_obese.first_obese_date)) then 0 else 1 end as obese_hx           
 FROM noC19_IRtime_update left join first_obese
 on noC19_IRtime_update.patient_id = first_obese.obese_patient
-where (noC19_IRtime_update.index_dc >= first_obese.first_obese_date) or (first_obese_date is null) 
 
 @transform_pandas(
     Output(rid="ri.vector.main.execute.3453adaf-5521-4dc3-8b79-f89fed11bfa1"),
     noC19_obese=Input(rid="ri.vector.main.execute.bd4e5971-3138-4dd4-a438-9cac869516a8")
 )
-SELECT count(patient_id)
+SELECT obese_hx,
+        count(1) as obesepatient
 FROM noC19_obese
-where obese_patient is not null
+group by obese_hx
 
 @transform_pandas(
     Output(rid="ri.vector.main.execute.0037d4d7-8a2a-43f9-a0c7-b86b98ed9a6a"),
@@ -1999,6 +2081,14 @@ SELECT  count(patient_id),
 FROM index_no_c19
 
 @transform_pandas(
+    Output(rid="ri.vector.main.execute.be9a5241-c4c4-4795-912e-aab9502d2724"),
+    noC19_COPD=Input(rid="ri.vector.main.execute.388a6135-6cfa-4cd8-aebd-baa8de14fe2f")
+)
+SELECT count(patient_id)
+FROM noC19_COPD
+where COPD_patient is null
+
+@transform_pandas(
     Output(rid="ri.vector.main.execute.8fab78b6-1f6b-42df-8c27-21ed9dba5698"),
     condition_occurrence=Input(rid="ri.foundry.main.dataset.526c0452-7c18-46b6-8a5d-59be0b79a10b")
 )
@@ -2030,14 +2120,14 @@ group by c19_status
 order by num_records asc
 
 @transform_pandas(
-    Output(rid="ri.vector.main.execute.9a414acc-7316-437a-9b47-7d382a594cef")
+    Output(rid="ri.vector.main.execute.e7a21e82-bd0a-471d-bf68-02cdc3f7e8c5"),
+    data_all=Input(rid="ri.foundry.main.dataset.affd8c40-b8a7-4a79-b931-da39819027b0")
 )
-select  c19,
-        count(1) as num_records ,       
-        sum(smoker)       
-from dataset_smk
-group by c19
-order by num_records asc
+SELECT  patient_id as racegrp_id,
+        race,
+        ethnicity,
+        case when ((race is null or race like '%No%' or race like '%Unknown%' or race like '%Refuse%') and ethnicity not like '%Hispanic%') then 0 else 1 end as racegrp
+FROM data_all
 
 @transform_pandas(
     Output(rid="ri.vector.main.execute.3842ffa5-dc9f-4b08-bdea-b80bc174b77c"),
@@ -2090,7 +2180,7 @@ SELECT  statin.person_id as statin_patient,
        dataset_all_update.c19,
        dataset_all_update.HFcase
 FROM dataset_all_update left join statin
-ON dataset_all_update.ID = statin.person_id
+ON dataset_all_update.patient_id = statin.person_id
 WHERE statin.drug_era_start_date <= dataset_all_update.index_dc and statin.person_id is not null
 
 @transform_pandas(
@@ -2150,4 +2240,13 @@ SELECT  percentile_approx(futime_all, 0.5) as Allmedian,
         percentile_approx(futime_all, 0.25) as Allq1,
         percentile_approx(futime_all, 0.75) as Allq3
 FROM dataset_all_Rx
+
+@transform_pandas(
+    Output(rid="ri.vector.main.execute.14a5b1b0-0a6c-4af6-8014-23591498c251"),
+    race_cc=Input(rid="ri.vector.main.execute.e7a21e82-bd0a-471d-bf68-02cdc3f7e8c5")
+)
+SELECT  racegrp_id,
+        case when race = 'White' then 1 else 0 end as white
+FROM race_cc
+where racegrp = 1
 

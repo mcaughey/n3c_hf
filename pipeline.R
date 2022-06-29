@@ -6,7 +6,7 @@ library("survival")
 )
 library("survival") 
 cox_Intx_Rx <- function(dataset_cats) {
-        result <- coxph(Surv(futime_all, HFcase) ~ c19*CVD_Rx + age + sex + racegroup + hxDM + hxCAD + hxObese + hxCKD + hxCOPD + hxHTN
+        result <- coxph(Surv(futime_all, HFcase) ~ c19*CVD_Rx + age + sex + white + DM_hx + CAD_hx + obese_hx + CKD_hx + COPD_hx + HTN_hx
         + ACEi + ARB + BB + statin, data=dataset_cats)
     print(result)
     return(NULL)
@@ -18,7 +18,7 @@ cox_Intx_Rx <- function(dataset_cats) {
 )
 library("survival") 
 cox_Intx_age <- function(dataset_cats) {
-        result <- coxph(Surv(futime_all, HFcase) ~ c19*agecat + age + racegroup + sex + hxDM + hxCAD + hxObese + hxCKD + hxCOPD +                 hxHTN + ACEi + ARB + BB + statin, data=dataset_cats)
+        result <- coxph(Surv(futime_all, HFcase) ~ c19*agecat + age + white + sex + DM_hx + CAD_hx + obese_hx + CKD_hx + COPD_hx + HTN_hx                  + ACEi + ARB + BB + statin, data=dataset_cats)
     print(result)
     return(NULL)
 }
@@ -29,8 +29,8 @@ cox_Intx_age <- function(dataset_cats) {
 )
 library("survival") 
 cox_Intx_race <- function(dataset_all_Rx) {
-        result <- coxph(Surv(futime_all, HFcase) ~ c19*racegroup + age + sex +  hxDM + hxCAD + hxObese + hxCKD + hxCOPD  
-               + hxHTN + ACEi + ARB + BB + statin, data=dataset_all_Rx)
+        result <- coxph(Surv(futime_all, HFcase) ~ c19*white + age + sex + DM_hx + CAD_hx + obese_hx + CKD_hx + COPD_hx + HTN_hx 
+            + ACEi + ARB + BB + statin, data=dataset_all_Rx)
     print(result)
     return(NULL)
 }
@@ -41,7 +41,7 @@ cox_Intx_race <- function(dataset_all_Rx) {
 )
 library("survival") 
 cox_Intx_sex <- function(dataset_all_Rx) {
-        result <- coxph(Surv(futime_all, HFcase) ~ c19*sex + age + racegroup + hxDM + hxCAD + hxObese + hxCKD + hxCOPD + hxHTN
+        result <- coxph(Surv(futime_all, HFcase) ~ c19*sex + age + white + DM_hx + CAD_hx + obese_hx + CKD_hx + COPD_hx + HTN_hx
         + ACEi + ARB + BB + statin, data=dataset_all_Rx)
     print(result)
     return(NULL)
@@ -53,7 +53,7 @@ cox_Intx_sex <- function(dataset_all_Rx) {
 )
 library("survival") 
 cox_all <- function(dataset_all_update) {
-        result <- coxph(Surv(futime_all, HFcase) ~ c19 + age + sex + racegroup + hxDM + hxCAD + hxObese + hxCKD + hxCOPD + hxHTN, data=dataset_all_temp)
+        result <- coxph(Surv(futime_all, HFcase) ~ c19 + age + sex + white + DM_hx + CAD_hx + obese_hx + CKD_hx + COPD_hx + HTN_hx, data=dataset_all_update)
     print(result)
     return(NULL)
 }
@@ -64,7 +64,7 @@ cox_all <- function(dataset_all_update) {
 )
 library("survival") 
 cox_all_F <- function(dataset_all_F) {
-        result <- coxph(Surv(futime_all, HFcase) ~ c19 + age + racegroup + hxDM + hxCAD + hxObese + hxCKD + hxCOPD + hxHTN
+        result <- coxph(Surv(futime_all, HFcase) ~ c19 + age + white + DM_hx + CAD_hx + obese_hx + CKD_hx + COPD_hx + HTN_hx
         + ACEi + ARB + BB + statin, data=dataset_all_F)
     print(result)
     return(NULL)
@@ -76,7 +76,7 @@ cox_all_F <- function(dataset_all_F) {
 )
 library("survival") 
 cox_all_M <- function(dataset_all_M) {
-        result <- coxph(Surv(futime_all, HFcase) ~ c19 + age + racegroup + hxDM + hxCAD + hxObese + hxCKD + hxCOPD + hxHTN
+        result <- coxph(Surv(futime_all, HFcase) ~ c19 + age + white + DM_hx + CAD_hx + obese_hx + CKD_hx + COPD_hx + HTN_hx
         + ACEi + ARB + BB + statin, data=dataset_all_M)
     print(result)
     return(NULL)
@@ -99,7 +99,7 @@ cox_all_crude <- function(dataset_all_update) {
 )
 library("survival") 
 cox_all_dem <- function(dataset_all_update) {
-        result <- coxph(Surv(futime_all, HFcase) ~ c19 + age + sex + racegroup, data=dataset_all_temp)
+        result <- coxph(Surv(futime_all, HFcase) ~ c19 + age + sex + white, data=dataset_all_update)
     print(result)
     return(NULL)
 }
@@ -110,7 +110,7 @@ cox_all_dem <- function(dataset_all_update) {
 )
 library("survival") 
 cox_all_nonwhite <- function(dataset_all_nonwhite) {
-        result <- coxph(Surv(futime_all, HFcase) ~ c19 + age + sex + hxDM + hxCAD + hxObese + hxCKD + hxCOPD + hxHTN
+        result <- coxph(Surv(futime_all, HFcase) ~ c19 + age + sex + DM_hx + CAD_hx + obese_hx + CKD_hx + COPD_hx + HTN_hx
         + ACEi + ARB + BB + statin, data=dataset_all_nonwhite)
     print(result)
     return(NULL)
@@ -122,7 +122,7 @@ cox_all_nonwhite <- function(dataset_all_nonwhite) {
 )
 library("survival") 
 cox_all_over65 <- function(dataset_all_over65) {
-        result <- coxph(Surv(futime_all, HFcase) ~ c19 + age + sex + racegroup + hxDM + hxCAD + hxObese + hxCKD + hxCOPD + hxHTN
+        result <- coxph(Surv(futime_all, HFcase) ~ c19 + age + sex + white + DM_hx + CAD_hx + obese_hx + CKD_hx + COPD_hx + HTN_hx
         + ACEi + ARB + BB + statin, data=dataset_all_over65)
     print(result)
     return(NULL)
@@ -134,7 +134,7 @@ cox_all_over65 <- function(dataset_all_over65) {
 )
 library("survival") 
 cox_all_rx <- function(dataset_all_Rx) {
-        result <- coxph(Surv(futime_all, HFcase) ~ c19 + age + sex + racegroup + hxDM + hxCAD + hxObese + hxCKD + hxCOPD + hxHTN 
+        result <- coxph(Surv(futime_all, HFcase) ~ c19 + age + sex + white + DM_hx + CAD_hx + obese_hx + CKD_hx + COPD_hx + HTN_hx 
         + ACEi + ARB + BB + statin,
         data=dataset_all_Rx)
     print(result)
@@ -147,7 +147,7 @@ cox_all_rx <- function(dataset_all_Rx) {
 )
 library("survival") 
 cox_all_under65 <- function(dataset_all_under65) {
-        result <- coxph(Surv(futime_all, HFcase) ~ c19 + age + sex + racegroup + hxDM + hxCAD + hxObese + hxCKD + hxCOPD + hxHTN
+        result <- coxph(Surv(futime_all, HFcase) ~ c19 + age + sex + white + DM_hx + CAD_hx + obese_hx + CKD_hx + COPD_hx + HTN_hx
         + ACEi + ARB + BB + statin, data=dataset_all_under65)
     print(result)
     return(NULL)
@@ -159,7 +159,7 @@ cox_all_under65 <- function(dataset_all_under65) {
 )
 library("survival") 
 cox_all_white <- function(dataset_all_white) {
-        result <- coxph(Surv(futime_all, HFcase) ~ c19 + age + sex + hxDM + hxCAD + hxObese + hxCKD + hxCOPD + hxHTN
+        result <- coxph(Surv(futime_all, HFcase) ~ c19 + age + sex + DM_hx + CAD_hx + obese_hx + CKD_hx + COPD_hx + HTN_hx
         + ACEi + ARB + BB + statin, data=dataset_all_white)
     print(result)
     return(NULL)
@@ -195,7 +195,7 @@ cox_death <- function(dataset_all_Rx) {
 )
 library("survival") 
 cox_no_Rx <- function(dataset_No_Rx) {
-        result <- coxph(Surv(futime_all, HFcase) ~ c19 + age + sex + racegroup + hxDM + hxCAD + hxObese + hxCKD + hxCOPD + hxHTN
+        result <- coxph(Surv(futime_all, HFcase) ~ c19 + age + sex + white + DM_hx + CAD_hx + obese_hx + CKD_hx + COPD_hx + HTN_hx
         + ACEi + ARB + BB + statin, data=dataset_No_Rx)
     print(result)
     return(NULL)
@@ -207,7 +207,7 @@ cox_no_Rx <- function(dataset_No_Rx) {
 )
 library("survival") 
 cox_no_hi_NP <- function(hi_NP_exclude) {
-        result <- coxph(Surv(futime_all, HFcase) ~ c19 + age + sex + racegroup + hxDM + hxCAD + hxObese + hxCKD + hxCOPD + hxHTN
+        result <- coxph(Surv(futime_all, HFcase) ~ c19 + age + sex + white + DM_hx + CAD_hx + obese_hx + CKD_hx + COPD_hx + HTN_hx
         + ACEi + ARB + BB + statin, data=hi_NP_exclude)
     print(result)
     return(NULL)
@@ -219,9 +219,97 @@ cox_no_hi_NP <- function(hi_NP_exclude) {
 )
 library("survival") 
 cox_with_Rx <- function(dataset_with_Rx) {
-        result <- coxph(Surv(futime_all, HFcase) ~ c19 + age + sex + racegroup + hxDM + hxCAD + hxObese + hxCKD + hxCOPD + hxHTN
+        result <- coxph(Surv(futime_all, HFcase) ~ c19 + age + sex + white + DM_hx + CAD_hx + obese_hx + CKD_hx + COPD_hx + HTN_hx
         + ACEi + ARB + BB + statin, data=dataset_with_Rx)
     print(result)
     return(NULL)
+}
+
+@transform_pandas(
+    Output(rid="ri.vector.main.execute.890eaf83-ab67-41e6-a0cb-35ade8801e7b"),
+    dataset_all_F=Input(rid="ri.vector.main.execute.555f06a2-ad3d-4a50-83bc-f41cce076e70")
+)
+library("survival") 
+crude_F <- function(dataset_all_F) {
+        result <- coxph(Surv(futime_all, HFcase) ~ c19, data=dataset_all_F)
+    print(result)
+    return(NULL)   
+}
+
+@transform_pandas(
+    Output(rid="ri.vector.main.execute.4f6cbbfa-3ffc-496e-b5bb-6597817648f3"),
+    dataset_all_M=Input(rid="ri.vector.main.execute.afb8595c-da82-430e-ada5-acfa6ecbe19a")
+)
+library("survival")
+crude_M <- function(dataset_all_M) {
+ result <- coxph(Surv(futime_all, HFcase) ~ c19, data=dataset_all_M)
+    print(result)
+    return(NULL)   
+}
+
+@transform_pandas(
+    Output(rid="ri.vector.main.execute.03984023-0807-4a18-b803-d163773714dd"),
+    dataset_No_Rx=Input(rid="ri.vector.main.execute.daf437ee-de2c-4bb3-a390-d4c1e81f97d8")
+)
+library ("survival")
+crude_noRx <- function(dataset_No_Rx) {
+        result <- coxph(Surv(futime_all, HFcase) ~ c19, data=dataset_No_Rx)
+    print(result)
+    return(NULL) 
+}
+
+@transform_pandas(
+    Output(rid="ri.vector.main.execute.7a80a54c-8ba0-4031-8320-25bad9f14c46"),
+    dataset_all_nonwhite=Input(rid="ri.vector.main.execute.4607ebab-6a6e-4075-81b8-d290bb1784e5")
+)
+library("survival")
+crude_nonWhite <- function(dataset_all_nonwhite) {
+       result <- coxph(Surv(futime_all, HFcase) ~ c19, data=dataset_all_nonwhite)
+    print(result)
+    return(NULL)
+}
+
+@transform_pandas(
+    Output(rid="ri.vector.main.execute.9cf4a4e2-5de6-47f8-9605-7f54d852b934"),
+    dataset_all_over65=Input(rid="ri.vector.main.execute.99845b4a-5950-466d-9366-4758069efd5a")
+)
+library ("survival")
+crude_over65 <- function(dataset_all_over65) {
+    result <- coxph(Surv(futime_all, HFcase) ~ c19, data=dataset_all_over65)
+    print(result)
+    return(NULL) 
+}
+
+@transform_pandas(
+    Output(rid="ri.vector.main.execute.063ff8c0-15b7-4fb6-9209-b478ed4de0b3"),
+    dataset_all_under65=Input(rid="ri.vector.main.execute.c6cb4360-24c7-454a-9fd9-e19230e99c12")
+)
+library("survival")
+crude_under65 <- function(dataset_all_under65) {
+   result <- coxph(Surv(futime_all, HFcase) ~ c19, data=dataset_all_under65)
+    print(result)
+    return(NULL)  
+}
+
+@transform_pandas(
+    Output(rid="ri.vector.main.execute.591e5d13-aced-43d2-9835-55d40b0e1153"),
+    dataset_all_white=Input(rid="ri.vector.main.execute.b0401bbb-c7b7-40d2-ab32-848725e12bc7")
+)
+library("survival")
+crude_white <- function(dataset_all_white) {
+     result <- coxph(Surv(futime_all, HFcase) ~ c19, data=dataset_all_white)
+    print(result)
+    return(NULL) 
+}
+
+@transform_pandas(
+    Output(rid="ri.vector.main.execute.93c59b1c-36f7-413b-9fb7-a27436155419"),
+    dataset_with_Rx=Input(rid="ri.vector.main.execute.d5572b3d-7264-40ff-b6d1-31f86981f174")
+)
+library ("survival")
+crude_withRx <- function(dataset_with_Rx) {
+       result <- coxph(Surv(futime_all, HFcase) ~ c19, data=dataset_with_Rx)
+    print(result)
+    return(NULL) 
 }
 
